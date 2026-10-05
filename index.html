@@ -9,7 +9,7 @@
 <!-- Open Graph / Meta -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Abhay Pratap Singh — Software Engineer & AI-Native Product Builder">
-<meta property="og:description" content="Living GitHub-powered portfolio featuring real-time repository discovery, case studies, and verified engineering metrics.">
+<meta property="og:description" content="Living GitHub-powered portfolio featuring real-time repository discovery, interactive galaxy engine, and verified engineering metrics.">
 <meta property="og:url" content="https://github.com/Abhay8769305414">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -20,18 +20,18 @@
 <style>
   /* ============ DESIGN TOKENS & SYSTEM ============ */
   :root {
-    --bg:            #0B1220;
-    --surface:       #121B2E;
-    --surface-2:     #17233A;
-    --surface-hover: #1E2D4A;
-    --line:          #22314D;
-    --line-light:    #2F4166;
+    --bg:            #080D1A;
+    --surface:       #111A2E;
+    --surface-2:     #16233B;
+    --surface-hover: #1D2E4D;
+    --line:          #223250;
+    --line-light:    #2E4268;
     --text:          #E8ECF1;
     --text-muted:    #8B96AC;
     --accent:        #4FD1C5;   /* cyan/teal signal */
     --accent-dim:    #2E7C74;
-    --accent-glow:   rgba(79, 209, 197, 0.15);
-    --amber:         #F5A623;   /* benchmark metrics */
+    --accent-glow:   rgba(79, 209, 197, 0.25);
+    --amber:         #F5A623;   /* verified numeric benchmarks */
     --amber-dim:     rgba(245, 166, 35, 0.15);
     --radius-sm:     8px;
     --radius:        14px;
@@ -50,31 +50,83 @@
     font-family: var(--body);
     line-height: 1.6;
     overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
   }
   a { color:inherit; text-decoration:none; }
   img { max-width:100%; display:block; }
   button { font-family:inherit; background:none; border:none; cursor:pointer; color:inherit; }
   ::selection { background:var(--accent); color:var(--bg); }
 
-  .wrap { max-width:1160px; margin:0 auto; padding:0 32px; }
+  .wrap { max-width:1160px; margin:0 auto; padding:0 32px; position:relative; z-index:10; }
 
-  /* ============ BACKGROUND TEXTURE ============ */
+  /* ============ GALAXY & ATMOSPHERIC LAYERS ============ */
+  #galaxyCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .space-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(ellipse 90% 75% at 50% 40%, transparent 40%, rgba(5, 9, 18, 0.8) 100%);
+  }
+
+  .space-nebula-glow {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      radial-gradient(circle 700px at 85% 15%, rgba(79, 209, 197, 0.07), transparent 70%),
+      radial-gradient(circle 800px at 15% 55%, rgba(99, 102, 241, 0.06), transparent 70%),
+      radial-gradient(circle 600px at 50% 88%, rgba(56, 189, 248, 0.05), transparent 70%);
+    mix-blend-mode: screen;
+  }
+
+  .cursor-aura {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 420px;
+    height: 420px;
+    margin-left: -210px;
+    margin-top: -210px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79, 209, 197, 0.12) 0%, rgba(99, 102, 241, 0.05) 45%, transparent 70%);
+    pointer-events: none;
+    z-index: 3;
+    transform: translate3d(-9999px, -9999px, 0);
+    transition: opacity 0.3s ease;
+    will-change: transform;
+  }
+
   .grid-bg {
-    position:fixed; inset:0; z-index:0; pointer-events:none;
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
     background-image:
       linear-gradient(var(--line) 1px, transparent 1px),
       linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size:64px 64px;
-    opacity:0.18;
-    mask-image: radial-gradient(ellipse 85% 65% at 50% 0%, black 40%, transparent 100%);
+    background-size: 64px 64px;
+    opacity: 0.14;
+    mask-image: radial-gradient(ellipse 85% 65% at 50% 0%, black 35%, transparent 100%);
   }
 
   /* ============ HEADER & NAV ============ */
   header {
     position:sticky; top:0; z-index:60;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background:rgba(11, 18, 32, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background:rgba(8, 13, 26, 0.85);
     border-bottom:1px solid var(--line);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -145,7 +197,7 @@
   .btn:active { transform: scale(0.97) !important; }
   .btn-primary { background:var(--accent); color:var(--bg); font-weight:600; }
   .btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 25px -6px var(--accent); }
-  .btn-ghost { border:1px solid var(--line); color:var(--text); background:rgba(18,27,46,0.5); }
+  .btn-ghost { border:1px solid var(--line); color:var(--text); background:rgba(17, 26, 46, 0.7); backdrop-filter:blur(6px); }
   .btn-ghost:hover { border-color:var(--accent); color:var(--accent); background:var(--surface-2); }
   .btn-sm { padding:6px 12px; font-size:12px; border-radius:6px; }
 
@@ -159,7 +211,7 @@
 
   /* ============ HERO SECTION ============ */
   .hero {
-    position:relative; z-index:1; padding:90px 0 60px;
+    position:relative; z-index:10; padding:90px 0 60px;
   }
   .hero-meta-row {
     display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
@@ -173,7 +225,8 @@
 
   .sync-pill {
     font-family:var(--mono); font-size:11.5px; color:var(--text-muted);
-    background:var(--surface); border:1px solid var(--line);
+    background:rgba(17, 26, 46, 0.85); backdrop-filter:blur(6px);
+    border:1px solid var(--line);
     padding:5px 12px; border-radius:20px; display:inline-flex; align-items:center; gap:7px;
   }
   .sync-pill .sync-dot {
@@ -188,7 +241,7 @@
     line-height:1.06; letter-spacing:-0.025em; max-width:860px;
     opacity:0; animation:rise .8s ease forwards .2s;
   }
-  h1.title .hl { color:var(--accent); }
+  h1.title .hl { color:var(--accent); text-shadow: 0 0 20px rgba(79, 209, 197, 0.35); }
 
   .hero-sub {
     margin-top:24px; font-size:17.5px; color:var(--text-muted); max-width:680px;
@@ -206,7 +259,8 @@
   /* ============ LIVE METRIC TICKER ============ */
   .ticker-shell {
     margin-top:56px; border:1px solid var(--line); border-radius:var(--radius);
-    background:var(--surface); overflow:hidden;
+    background:rgba(17, 26, 46, 0.88); backdrop-filter:blur(8px);
+    overflow:hidden;
     opacity:0; animation:rise .8s ease forwards .65s;
   }
   .ticker-label {
@@ -228,11 +282,11 @@
   .metric b { color:var(--amber); font-size:15.5px; }
   .ticker-track.has-hover .metric { opacity:0.35; }
   .ticker-track.has-hover .metric.hovered {
-    opacity:1; color:var(--text); background:rgba(79,209,197,0.06);
+    opacity:1; color:var(--text); background:rgba(79,209,197,0.08);
   }
 
   /* ============ SECTION SHELL & DIVIDERS ============ */
-  section { position:relative; z-index:1; padding:90px 0; }
+  section { position:relative; z-index:10; padding:90px 0; }
   .sec-divider {
     position:absolute; top:0; left:32px; right:32px; max-width:1160px; margin:0 auto; height:1px;
     background:linear-gradient(90deg, transparent, var(--line) 15%, var(--line) 85%, transparent);
@@ -267,12 +321,13 @@
   }
   .search-input {
     width:100%; font-family:var(--mono); font-size:13.5px;
-    background:var(--surface); border:1px solid var(--line);
+    background:rgba(17, 26, 46, 0.85); backdrop-filter:blur(6px);
+    border:1px solid var(--line);
     color:var(--text); padding:10px 14px 10px 40px; border-radius:9px;
     outline:none; transition:border-color 0.2s, box-shadow 0.2s;
   }
   .search-input:focus {
-    border-color:var(--accent); box-shadow:0 0 0 3px rgba(79, 209, 197, 0.12);
+    border-color:var(--accent); box-shadow:0 0 0 3px rgba(79, 209, 197, 0.15);
   }
   .search-input::placeholder { color:var(--text-muted); opacity:0.7; }
 
@@ -281,7 +336,8 @@
   }
   .filter-btn {
     font-family:var(--mono); font-size:12.5px; padding:7px 14px; border-radius:20px;
-    border:1px solid var(--line); color:var(--text-muted); background:var(--surface);
+    border:1px solid var(--line); color:var(--text-muted);
+    background:rgba(17, 26, 46, 0.85); backdrop-filter:blur(6px);
     transition:all 0.2s ease;
   }
   .filter-btn:hover { border-color:var(--accent-dim); color:var(--text); }
@@ -299,14 +355,15 @@
     display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:24px;
   }
   .proj-card {
-    border:1px solid var(--line); border-radius:var(--radius); background:var(--surface);
+    border:1px solid var(--line); border-radius:var(--radius);
+    background:rgba(17, 26, 46, 0.92); backdrop-filter:blur(10px);
     overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;
     transition:transform .3s cubic-bezier(0.16, 1, 0.3, 1), border-color .3s, box-shadow .3s;
     will-change:transform; position:relative;
   }
   .proj-card:hover {
     border-color:var(--accent-dim);
-    box-shadow: 0 16px 36px -12px rgba(0,0,0,0.5), 0 0 20px -8px var(--accent-glow);
+    box-shadow: 0 16px 36px -12px rgba(0,0,0,0.6), 0 0 24px -6px var(--accent-glow);
   }
 
   .proj-visual {
@@ -322,7 +379,7 @@
 
   .proj-visual .chrome {
     position:absolute; top:10px; left:12px; right:12px; height:22px;
-    background:rgba(11, 18, 32, 0.9); backdrop-filter:blur(4px);
+    background:rgba(8, 13, 26, 0.92); backdrop-filter:blur(4px);
     border-radius:6px; display:flex; align-items:center; justify-content:space-between;
     padding:0 10px; border:1px solid var(--line); z-index:2;
   }
@@ -333,7 +390,7 @@
   .proj-visual .blueprint-art {
     position:absolute; inset:0; display:flex; flex-direction:column;
     align-items:center; justify-content:center; padding:24px; text-align:center;
-    background:radial-gradient(ellipse at center, rgba(79,209,197,0.06), transparent 70%);
+    background:radial-gradient(ellipse at center, rgba(79,209,197,0.08), transparent 70%);
   }
   .blueprint-icon {
     width:42px; height:42px; border-radius:10px; background:var(--surface-2);
@@ -366,12 +423,19 @@
   .proj-bullets li { position:relative; padding-left:16px; margin-bottom:6px; }
   .proj-bullets li::before { content:'—'; position:absolute; left:0; color:var(--accent-dim); }
 
+  /* METRICS (AMBER) VS TECHNICAL CHARACTERISTICS (TEAL) */
   .proj-metric-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
   .proj-metric {
     display:inline-flex; align-items:center; gap:6px;
     font-family:var(--mono); font-size:12px; color:var(--amber);
     background:var(--amber-dim); border:1px solid rgba(245,166,35,0.3);
     padding:4px 10px; border-radius:6px;
+  }
+  .tech-char-tag {
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--mono); font-size:11.5px; color:var(--accent);
+    background:rgba(79, 209, 197, 0.08); border:1px solid rgba(79, 209, 197, 0.25);
+    padding:3px 8px; border-radius:6px;
   }
 
   .proj-footer {
@@ -388,7 +452,8 @@
   @media (max-width:860px) { .activity-grid { grid-template-columns:1fr; } }
 
   .activity-card {
-    border:1px solid var(--line); border-radius:var(--radius); background:var(--surface);
+    border:1px solid var(--line); border-radius:var(--radius);
+    background:rgba(17, 26, 46, 0.92); backdrop-filter:blur(8px);
     padding:28px;
   }
   .activity-card h3 {
@@ -404,6 +469,7 @@
   .buildlog-item::before {
     content:''; position:absolute; left:-25px; top:5px; width:9px; height:9px;
     border-radius:50%; background:var(--bg); border:2px solid var(--accent);
+    box-shadow:0 0 8px var(--accent);
   }
   .buildlog-date { font-family:var(--mono); font-size:11.5px; color:var(--accent); margin-bottom:2px; }
   .buildlog-name { font-weight:600; font-size:14.5px; color:var(--text); }
@@ -422,7 +488,8 @@
 
   /* ============ TECH STACK & DYNAMIC LANGUAGE BARS ============ */
   .lang-dist-shell {
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    background:rgba(17, 26, 46, 0.92); backdrop-filter:blur(8px);
+    border:1px solid var(--line); border-radius:var(--radius);
     padding:24px; margin-bottom:32px;
   }
   .lang-dist-bar {
@@ -441,7 +508,7 @@
     gap:1px; background:var(--line); border:1px solid var(--line);
     border-radius:var(--radius); overflow:hidden;
   }
-  .skill-group { background:var(--surface); padding:26px; }
+  .skill-group { background:rgba(17, 26, 46, 0.94); backdrop-filter:blur(8px); padding:26px; }
   .skill-group h4 {
     font-family:var(--mono); font-size:12px; color:var(--accent);
     text-transform:uppercase; letter-spacing:0.06em; margin-bottom:14px;
@@ -461,7 +528,7 @@
 
   .stat-card {
     border:1px solid var(--line); border-radius:var(--radius); padding:22px;
-    background:var(--surface); margin-bottom:14px;
+    background:rgba(17, 26, 46, 0.92); backdrop-filter:blur(8px); margin-bottom:14px;
   }
   .stat-card .num { font-family:var(--display); font-size:32px; color:var(--accent); font-weight:700; }
   .stat-card .lbl { font-size:13px; color:var(--text-muted); margin-top:4px; }
@@ -473,6 +540,7 @@
   .tl-item::before {
     content:''; position:absolute; left:-37px; top:4px; width:11px; height:11px;
     border-radius:50%; background:var(--bg); border:2px solid var(--accent);
+    box-shadow:0 0 10px var(--accent);
   }
   .tl-role { font-family:var(--display); font-size:19px; font-weight:600; }
   .tl-org { color:var(--accent); font-size:14px; margin-top:2px; }
@@ -484,19 +552,19 @@
   /* ============ CONTACT BOX & FOOTER ============ */
   .contact-box {
     border:1px solid var(--line); border-radius:20px; padding:64px 48px; text-align:center;
-    background:radial-gradient(ellipse at 50% 0%, var(--surface-2), var(--surface));
-    position:relative; overflow:hidden;
+    background:radial-gradient(ellipse at 50% 0%, rgba(22, 35, 59, 0.95), rgba(17, 26, 46, 0.96));
+    backdrop-filter:blur(14px); position:relative; overflow:hidden;
   }
   .contact-box h2 { font-family:var(--display); font-size:clamp(1.8rem, 4vw, 2.8rem); font-weight:700; margin-bottom:16px; }
   .contact-box p { color:var(--text-muted); margin-bottom:32px; font-size:16px; }
   .contact-links { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
 
-  footer { padding:40px 0; text-align:center; }
+  footer { padding:40px 0; text-align:center; position:relative; z-index:10; }
   footer p { font-family:var(--mono); font-size:12.5px; color:var(--text-muted); }
 
   /* ============ CASE STUDY MODAL / DRAWER ============ */
   .modal-backdrop {
-    position:fixed; inset:0; background:rgba(7, 11, 20, 0.85); backdrop-filter:blur(8px);
+    position:fixed; inset:0; background:rgba(5, 9, 18, 0.9); backdrop-filter:blur(12px);
     z-index:100; display:none; align-items:center; justify-content:center; padding:24px;
     opacity:0; transition:opacity 0.25s ease;
   }
@@ -504,8 +572,8 @@
 
   .modal-dialog {
     background:var(--surface); border:1px solid var(--line-light); border-radius:var(--radius-lg);
-    width:100%; max-width:880px; max-height:90vh; overflow-y:auto; position:relative;
-    box-shadow:0 25px 60px -15px rgba(0,0,0,0.8), 0 0 30px -5px var(--accent-glow);
+    width:100%; max-width:920px; max-height:92vh; overflow-y:auto; position:relative;
+    box-shadow:0 25px 60px -15px rgba(0,0,0,0.9), 0 0 30px -5px var(--accent-glow);
     animation:modalSlide .3s cubic-bezier(0.16, 1, 0.3, 1);
   }
   @keyframes modalSlide { from{ opacity:0; transform:translateY(20px) scale(0.98); } to{ opacity:1; transform:translateY(0) scale(1); } }
@@ -549,13 +617,13 @@
 
   /* ============ COMMAND PALETTE (CTRL+K) ============ */
   .cmd-backdrop {
-    position:fixed; inset:0; background:rgba(7, 11, 20, 0.85); backdrop-filter:blur(8px);
+    position:fixed; inset:0; background:rgba(5, 9, 18, 0.9); backdrop-filter:blur(12px);
     z-index:110; display:none; align-items:flex-start; justify-content:center; padding:80px 24px 24px;
   }
   .cmd-backdrop.open { display:flex; }
   .cmd-dialog {
     background:var(--surface); border:1px solid var(--line-light); border-radius:var(--radius);
-    width:100%; max-width:620px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.8);
+    width:100%; max-width:620px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.9);
   }
   .cmd-input-row {
     display:flex; align-items:center; padding:16px 20px; border-bottom:1px solid var(--line); gap:12px;
@@ -602,6 +670,7 @@
     .hero { padding:60px 0 40px; }
     .proj-grid { grid-template-columns:1fr; }
     .cmd-k-trigger span { display:none; }
+    .cursor-aura { display:none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -614,11 +683,17 @@
     .sec-divider { transform: scaleX(1) !important; transition: none !important; }
     .scroll-progress { display: none !important; }
     .ticker-track { animation: none !important; }
+    .cursor-aura { display: none !important; }
   }
 </style>
 </head>
 <body>
 
+<!-- GALAXY ATMOSPHERE & INTERACTIVE CANVAS -->
+<canvas id="galaxyCanvas"></canvas>
+<div class="space-vignette"></div>
+<div class="space-nebula-glow"></div>
+<div id="cursorAura" class="cursor-aura"></div>
 <div class="grid-bg"></div>
 
 <!-- HEADER -->
@@ -698,15 +773,15 @@
       <a class="btn btn-ghost" href="mailto:abhayps0702@gmail.com">Email me</a>
     </div>
 
-    <!-- SIGNATURE ELEMENT: VERIFIED METRIC TICKER -->
+    <!-- SIGNATURE ELEMENT: VERIFIED BENCHMARK METRIC TICKER -->
     <div class="ticker-shell">
       <div class="ticker-label">
-        <span>VERIFIED BENCHMARKS & METRICS</span>
+        <span>VERIFIED BENCHMARKS & LATENCY TARGETS</span>
         <span>PRODUCTION & EVALUATION BENCHMARKS</span>
       </div>
       <div class="ticker-track-wrap">
         <div class="ticker-track" id="tickerTrack">
-          <!-- Dynamically populated and looped -->
+          <!-- Dynamically populated from verified metrics -->
         </div>
       </div>
     </div>
@@ -857,27 +932,27 @@
     <div class="sec-head reveal">
       <div>
         <div class="sec-eyebrow">04 — ENGINEERING ACTIVITY & BUILD LOG</div>
-        <div class="sec-title">Recent Commits & Active Explorations</div>
+        <div class="sec-title">Recent Activity & Active Focus Areas</div>
       </div>
     </div>
 
     <div class="activity-grid reveal">
-      <!-- BUILD LOG / REPO TIMELINE -->
+      <!-- RECENTLY ACTIVE TIMELINE (DERIVED FROM GITHUB) -->
       <div class="activity-card">
         <h3>
-          <span>Live Build Log</span>
-          <span class="badge badge-accent">GitHub Sync</span>
+          <span>Recently Active (GitHub Activity)</span>
+          <span class="badge badge-accent">Live Commits</span>
         </h3>
         <div class="buildlog-timeline" id="buildLogTimeline">
           <!-- Populated from repository updates -->
         </div>
       </div>
 
-      <!-- CURRENTLY BUILDING & EXPLORING -->
+      <!-- CURRENTLY BUILDING (CURATED FOCUS AREAS) -->
       <div class="activity-card">
         <h3>
-          <span>Currently Building</span>
-          <span class="badge badge-amber">Active Focus</span>
+          <span>Currently Building (Active Explorations)</span>
+          <span class="badge badge-amber">Curated Focus</span>
         </h3>
         <div class="focus-list">
           <div class="focus-item">
@@ -978,7 +1053,7 @@
       <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close modal">✕</button>
     </div>
     <div class="modal-content" id="modalBody">
-      <!-- Injected dynamically -->
+      <!-- Injected dynamically with progressive disclosure -->
     </div>
   </div>
 </div>
@@ -996,35 +1071,373 @@
   </div>
 </div>
 
-<!-- ============ SCRIPT ENGINE & GITHUB INTELLIGENCE ============ -->
+<!-- ============ GALAXY ENGINE & APPLICATION SCRIPT ============ -->
 <script>
 /**
  * ─────────────────────────────────────────────────────────────
- * ABHAY PRATAP SINGH — GITHUB-POWERED PORTFOLIO ENGINE
+ * ABHAY PRATAP SINGH — GALAXY ENGINE & LIVING PORTFOLIO
  * ─────────────────────────────────────────────────────────────
- * 1. Offline Verified Snapshot (Zero layout shift / instant load)
- * 2. Background GitHub API Auto-Discovery & Stale-While-Revalidate
- * 3. Markdown README AST Parser (Problem, Solution, Architecture, Images)
- * 4. Dynamic Language Distribution & Verified Metric Calculators
- * 5. Case Study Modal Router & Command Palette (Ctrl+K)
+ * Visual Atmosphere:
+ *  - 4 Depth Star Layers + 4 Organic Galaxy Clusters
+ *  - Interactive Gravitational Cursor Influence & Velocity Warp
+ *  - Soft Atmospheric Nebula Cloud Gradients
+ *  - Ambient Constellation Topologies (AI Network Map)
+ *  - Hardware Accelerated, DPR Capped, Tab Visibility Paused
  * ─────────────────────────────────────────────────────────────
  */
 
 const GITHUB_USERNAME = 'Abhay8769305414';
-const CACHE_KEY = 'aps_portfolio_gh_v2';
+const CACHE_KEY = 'aps_portfolio_cache_v3';
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
-// 1. MANUAL CURATION & VERIFIED BENCHMARKS (EXTENDS GITHUB DATA)
+// 1. GALAXY & DEEP SPACE CANVAS ENGINE
+class InteractiveGalaxy {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    if (!this.canvas) return;
+    this.ctx = this.canvas.getContext('2d', { alpha: true });
+    this.stars = [];
+    this.clusters = [];
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    
+    // Mouse state
+    this.mouse = { x: -9999, y: -9999, targetX: -9999, targetY: -9999, vx: 0, vy: 0, active: false };
+    this.aura = document.getElementById('cursorAura');
+    
+    // Animation state
+    this.animId = null;
+    this.lastTime = performance.now();
+    this.isPaused = false;
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    this.init();
+  }
+
+  init() {
+    this.resize();
+    this.createClusters();
+    this.createStarField();
+    this.bindEvents();
+
+    if (!this.reducedMotion) {
+      this.animate();
+    } else {
+      this.drawFrame();
+    }
+  }
+
+  resize() {
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.canvas.width = Math.floor(this.width * this.dpr);
+    this.canvas.height = Math.floor(this.height * this.dpr);
+    this.canvas.style.width = this.width + 'px';
+    this.canvas.style.height = this.height + 'px';
+    this.ctx.scale(this.dpr, this.dpr);
+  }
+
+  createClusters() {
+    // 4 Organic Galaxy Centers
+    this.clusters = [
+      { x: this.width * 0.80, y: this.height * 0.22, radius: 260, color: 'rgba(79, 209, 197, 0.08)', driftAngle: 0, driftSpeed: 0.0004 },
+      { x: this.width * 0.18, y: this.height * 0.45, radius: 300, color: 'rgba(99, 102, 241, 0.07)', driftAngle: Math.PI / 2, driftSpeed: 0.00025 },
+      { x: this.width * 0.65, y: this.height * 0.78, radius: 240, color: 'rgba(56, 189, 248, 0.06)', driftAngle: Math.PI, driftSpeed: 0.0003 },
+      { x: this.width * 0.35, y: this.height * 0.15, radius: 200, color: 'rgba(245, 166, 35, 0.05)', driftAngle: Math.PI * 1.5, driftSpeed: 0.0004 }
+    ];
+  }
+
+  createStarField() {
+    this.stars = [];
+    const isMobile = this.width < 768;
+    const isTablet = this.width >= 768 && this.width < 1024;
+    const count = isMobile ? 110 : (isTablet ? 190 : 320);
+
+    for (let i = 0; i < count; i++) {
+      const rand = Math.random();
+      let layer = 1;
+      let depthMultiplier = 0.05;
+      let radius = 0.8 + Math.random() * 0.6;
+      let baseAlpha = 0.25 + Math.random() * 0.35;
+      let clusterId = -1;
+
+      if (rand > 0.80) {
+        layer = 3; // Foreground
+        depthMultiplier = 0.30;
+        radius = 1.8 + Math.random() * 1.4;
+        baseAlpha = 0.75 + Math.random() * 0.25;
+      } else if (rand > 0.45) {
+        layer = 2; // Mid
+        depthMultiplier = 0.14;
+        radius = 1.2 + Math.random() * 0.8;
+        baseAlpha = 0.45 + Math.random() * 0.35;
+      } else if (rand > 0.20) {
+        layer = 4; // Cluster star
+        clusterId = Math.floor(Math.random() * this.clusters.length);
+        depthMultiplier = 0.20;
+        radius = 1.0 + Math.random() * 0.9;
+        baseAlpha = 0.55 + Math.random() * 0.35;
+      }
+
+      // Initial position
+      let x, y;
+      if (clusterId >= 0) {
+        const c = this.clusters[clusterId];
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.pow(Math.random(), 1.4) * c.radius;
+        x = c.x + Math.cos(angle) * dist;
+        y = c.y + Math.sin(angle) * dist;
+      } else {
+        x = Math.random() * this.width;
+        y = Math.random() * this.height;
+      }
+
+      // Palette hints (white/silver, vibrant teal, soft indigo, warm amber spark)
+      const colorRand = Math.random();
+      let color = 'rgba(232, 236, 241, ';
+      if (colorRand > 0.78) color = 'rgba(79, 209, 197, ';     // Teal
+      else if (colorRand > 0.60) color = 'rgba(165, 180, 252, '; // Indigo
+      else if (colorRand > 0.94) color = 'rgba(245, 166, 35, ';  // Amber
+
+      this.stars.push({
+        x: x,
+        y: y,
+        baseX: x,
+        baseY: y,
+        vx: (Math.random() - 0.5) * 0.12,
+        vy: (Math.random() - 0.5) * 0.12,
+        layer: layer,
+        depthMultiplier: depthMultiplier,
+        radius: radius,
+        baseAlpha: baseAlpha,
+        alpha: baseAlpha,
+        color: color,
+        clusterId: clusterId,
+        twinkleSpeed: 0.0015 + Math.random() * 0.004,
+        twinklePhase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  bindEvents() {
+    window.addEventListener('resize', () => {
+      this.resize();
+      this.createClusters();
+      this.createStarField();
+      if (this.reducedMotion) this.drawFrame();
+    }, { passive: true });
+
+    window.addEventListener('mousemove', (e) => {
+      this.mouse.targetX = e.clientX;
+      this.mouse.targetY = e.clientY;
+      this.mouse.active = true;
+
+      if (this.aura) {
+        this.aura.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+        this.aura.style.opacity = '1';
+      }
+    }, { passive: true });
+
+    window.addEventListener('mouseleave', () => {
+      this.mouse.active = false;
+      this.mouse.targetX = -9999;
+      this.mouse.targetY = -9999;
+      if (this.aura) this.aura.style.opacity = '0';
+    }, { passive: true });
+
+    // Touch support (gentle gravitational ripple)
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        const t = e.touches[0];
+        this.mouse.targetX = t.clientX;
+        this.mouse.targetY = t.clientY;
+        this.mouse.active = true;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      this.mouse.active = false;
+    }, { passive: true });
+
+    // Tab visibility optimization
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.isPaused = true;
+        cancelAnimationFrame(this.animId);
+      } else {
+        this.isPaused = false;
+        this.lastTime = performance.now();
+        if (!this.reducedMotion) this.animate();
+      }
+    });
+  }
+
+  drawNebulaAtmosphere() {
+    this.clusters.forEach(c => {
+      const grad = this.ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.radius * 1.4);
+      grad.addColorStop(0, c.color);
+      grad.addColorStop(0.5, c.color.replace(/[\d\.]+\)$/, '0.02)'));
+      grad.addColorStop(1, 'transparent');
+      this.ctx.fillStyle = grad;
+      this.ctx.beginPath();
+      this.ctx.arc(c.x, c.y, c.radius * 1.4, 0, Math.PI * 2);
+      this.ctx.fill();
+    });
+  }
+
+  drawConstellations() {
+    const maxDist = 85;
+    this.ctx.lineWidth = 0.6;
+
+    for (let i = 0; i < this.stars.length; i++) {
+      const s1 = this.stars[i];
+      if (s1.layer === 1) continue;
+
+      let connections = 0;
+      for (let j = i + 1; j < this.stars.length; j++) {
+        if (connections >= 2) break;
+        const s2 = this.stars[j];
+        if (s2.layer === 1) continue;
+
+        const dx = s1.x - s2.x;
+        const dy = s1.y - s2.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < maxDist) {
+          const alpha = (1 - dist / maxDist) * 0.16;
+          this.ctx.strokeStyle = `rgba(79, 209, 197, ${alpha.toFixed(3)})`;
+          this.ctx.beginPath();
+          this.ctx.moveTo(s1.x, s1.y);
+          this.ctx.lineTo(s2.x, s2.y);
+          this.ctx.stroke();
+          connections++;
+        }
+      }
+    }
+  }
+
+  drawFrame() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.drawNebulaAtmosphere();
+    this.drawConstellations();
+
+    this.stars.forEach(s => {
+      this.ctx.fillStyle = `${s.color}${s.alpha.toFixed(2)})`;
+      this.ctx.beginPath();
+      this.ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+      this.ctx.fill();
+    });
+  }
+
+  animate() {
+    if (this.isPaused) return;
+
+    const now = performance.now();
+    const dt = Math.min((now - this.lastTime) / 1000, 0.1);
+    this.lastTime = now;
+
+    // Mouse interpolation & velocity
+    this.mouse.vx = (this.mouse.targetX - this.mouse.x) * 0.12;
+    this.mouse.vy = (this.mouse.targetY - this.mouse.y) * 0.12;
+    this.mouse.x += this.mouse.vx;
+    this.mouse.y += this.mouse.vy;
+
+    const mouseSpeed = Math.hypot(this.mouse.vx, this.mouse.vy);
+    const warpMagnitude = Math.min(mouseSpeed * 0.2, 8);
+
+    // Update clusters drift
+    this.clusters.forEach(c => {
+      c.driftAngle += c.driftSpeed;
+      c.x += Math.cos(c.driftAngle) * 0.1;
+      c.y += Math.sin(c.driftAngle) * 0.1;
+    });
+
+    // Clear and draw background atmosphere
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.drawNebulaAtmosphere();
+    this.drawConstellations();
+
+    const interactionRadius = 240;
+    const maxGravitationalPull = 32;
+
+    this.stars.forEach(s => {
+      // 1. Natural slow drift
+      s.baseX += s.vx;
+      s.baseY += s.vy;
+
+      if (s.baseX < -20) s.baseX = this.width + 20;
+      if (s.baseX > this.width + 20) s.baseX = -20;
+      if (s.baseY < -20) s.baseY = this.height + 20;
+      if (s.baseY > this.height + 20) s.baseY = -20;
+
+      // 2. Parallax shift from viewport center
+      const parallaxX = (this.mouse.x - this.width / 2) * s.depthMultiplier * 0.4;
+      const parallaxY = (this.mouse.y - this.height / 2) * s.depthMultiplier * 0.4;
+
+      let targetX = s.baseX + (this.mouse.active ? parallaxX : 0);
+      let targetY = s.baseY + (this.mouse.active ? parallaxY : 0);
+
+      // 3. Gravitational cursor influence
+      if (this.mouse.active && s.layer > 1) {
+        const dx = this.mouse.x - s.x;
+        const dy = this.mouse.y - s.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < interactionRadius && dist > 1) {
+          const force = (1 - dist / interactionRadius);
+          const pull = force * force * maxGravitationalPull * (s.layer === 3 ? 1.5 : 0.85);
+          targetX += (dx / dist) * pull;
+          targetY += (dy / dist) * pull;
+
+          // Momentary warp distortion along mouse vector
+          if (warpMagnitude > 0.5 && s.layer === 3) {
+            targetX += (this.mouse.vx / (mouseSpeed || 1)) * warpMagnitude;
+            targetY += (this.mouse.vy / (mouseSpeed || 1)) * warpMagnitude;
+          }
+        }
+      }
+
+      // Smooth damping
+      s.x += (targetX - s.x) * 0.09;
+      s.y += (targetY - s.y) * 0.09;
+
+      // 4. Star twinkle
+      s.twinklePhase += s.twinkleSpeed * 60 * dt;
+      const twinkle = Math.sin(s.twinklePhase);
+      s.alpha = Math.max(0.12, Math.min(1, s.baseAlpha + twinkle * 0.18));
+
+      // Draw star
+      this.ctx.fillStyle = `${s.color}${s.alpha.toFixed(2)})`;
+      this.ctx.beginPath();
+      this.ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      // Foreground star soft halo glow
+      if (s.layer === 3 && s.radius > 1.6) {
+        this.ctx.fillStyle = `${s.color}${(s.alpha * 0.35).toFixed(2)})`;
+        this.ctx.beginPath();
+        this.ctx.arc(s.x, s.y, s.radius * 2.4, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    });
+
+    this.animId = requestAnimationFrame(() => this.animate());
+  }
+}
+
+// 2. MANUAL CURATION & VERIFIED BENCHMARKS (CURATION LAYER)
 const PORTFOLIO_OVERRIDES = {
   "bharatmentor": {
     featured: true,
     displayOrder: 1,
     title: "BharatMentor — Multilingual Voice AI",
     category: "AI / ML",
-    verifiedMetrics: ["< 1.2s voice latency", "100% safe AST math evaluator"],
+    verifiedMetrics: ["< 1.2s end-to-end response latency"],
+    techCharacteristics: ["Safe AST Math Evaluator (Zero eval)", "FAISS Vector Retrieval", "Streaming STT/TTS"],
     customBullets: [
       "Voice-first AI learning mentor in English, Hindi & Hinglish with RAG knowledge retrieval.",
-      "FastAPI backend with streaming STT/TTS pipeline and PostgreSQL/SQLite progress tracker.",
+      "FastAPI backend with streaming STT/TTS pipeline and PostgreSQL/SQLite student progress tracker.",
       "Safe AST calculator avoiding eval() vulnerabilities + LLM-generated interactive quizzes."
     ],
     architecture: `Streamlit UI / Voice Web Client
@@ -1044,7 +1457,8 @@ Agent Controller (app/agent.py)
     displayOrder: 2,
     title: "Beep — Product Execution Copilot",
     category: "AI Agents",
-    verifiedMetrics: ["7-section structured PRDs", "100% deterministic backlogs"],
+    verifiedMetrics: ["7-section structured PRDs", "Deterministic ticket generation"],
+    techCharacteristics: ["Append-only version history", "Immutable prototype snapshots", "Gantt milestone planner"],
     customBullets: [
       "AI-powered PM copilot converting informal prototype wireframes into structured 7-section PRDs.",
       "Computes transparent diffs across prototype versions with deliberate human signoff gates.",
@@ -1057,7 +1471,8 @@ Agent Controller (app/agent.py)
     title: "Corporate Ownership & AML Investigator",
     category: "AI / ML",
     demoUrl: "https://corporate-ownership-aml-investigato.vercel.app",
-    verifiedMetrics: ["Multi-hop graph traversal", "Bolt / CognoDB OpenCypher"],
+    verifiedMetrics: [],
+    techCharacteristics: ["Multi-hop graph traversal", "Bolt / CognoDB OpenCypher", "Circular ownership resolution"],
     customBullets: [
       "Interactive graph application investigating multi-hop corporate structures and circular ownership.",
       "Detects Ultimate Beneficial Owners (UBO) and shared nominee director risks in real-time.",
@@ -1069,7 +1484,8 @@ Agent Controller (app/agent.py)
     displayOrder: 4,
     title: "Borrower Copilot — Retail Lending Engine",
     category: "Full Stack",
-    verifiedMetrics: ["100% client-side privacy", "RBI-compliant APR"],
+    verifiedMetrics: ["100% client-side calculation"],
+    techCharacteristics: ["Headless rule engine", "RBI APR model", "Zero bureau pings"],
     customBullets: [
       "Retail borrower advocacy platform balancing lending asymmetry across Indian retail credit.",
       "Pure headless rules engine calculating FOIR thresholds, true risk interest rates, and APRs.",
@@ -1082,7 +1498,8 @@ Agent Controller (app/agent.py)
     title: "GrowEasy — Enterprise Data Platform",
     category: "Full Stack",
     demoUrl: "https://grow-easy-backend.vercel.app",
-    verifiedMetrics: ["95%+ CSV import accuracy", "Gemini 2.5 Flash"],
+    verifiedMetrics: ["95%+ CSV import accuracy"],
+    techCharacteristics: ["Gemini 2.5 Flash schema inference", "Node 20+ pipeline", "Real-time progress monitoring"],
     customBullets: [
       "End-to-end data processing and automated CSV mapping platform with visual progress trackers.",
       "Modular Node 20+ / TypeScript backend with Gemini AI schema inference and structured error handling."
@@ -1093,7 +1510,8 @@ Agent Controller (app/agent.py)
     displayOrder: 6,
     title: "AI Fitness Coach App",
     category: "AI / ML",
-    verifiedMetrics: ["↑ 50% personalization", "Gemini LLM + Imagen 3.0"],
+    verifiedMetrics: ["↑ 50% personalization accuracy"],
+    techCharacteristics: ["Google Gemini LLM", "Imagen 3.0 visual generation", "Firebase Firestore persistence"],
     customBullets: [
       "Full-stack fitness assistant built on Next.js with Gemini LLM personalized workout & diet plans.",
       "Integrated visual guidance generation using Imagen 3.0 and Firebase Firestore persistence."
@@ -1104,7 +1522,8 @@ Agent Controller (app/agent.py)
     displayOrder: 7,
     title: "Finfully — Enterprise Automation Lab",
     category: "Automation",
-    verifiedMetrics: ["FastAPI + Celery Workers", "PostgreSQL + Docker"],
+    verifiedMetrics: [],
+    techCharacteristics: ["FastAPI + Celery Task Queue", "PostgreSQL + Redis", "Dockerized CI/CD"],
     customBullets: [
       "Enterprise financial automation engine for asynchronous document and transaction processing.",
       "Containerized Docker Compose environment with Celery task queues, Redis, and automated CI/CD."
@@ -1115,7 +1534,8 @@ Agent Controller (app/agent.py)
     displayOrder: 8,
     title: "Visual AI Agent — Chrome Extension",
     category: "AI Agents",
-    verifiedMetrics: ["Manifest V3 Architecture", "Prisma + PostgreSQL"],
+    verifiedMetrics: [],
+    techCharacteristics: ["Manifest V3 Service Worker", "Prisma ORM", "PostgreSQL"],
     customBullets: [
       "Manifest V3 Chrome Extension with modular background service workers and content script injection.",
       "Node.js + Express backend with Prisma ORM for structured multimodal visual assistance."
@@ -1126,7 +1546,8 @@ Agent Controller (app/agent.py)
     displayOrder: 9,
     title: "Resume-JD Matcher — REST API",
     category: "Dev Tools",
-    verifiedMetrics: ["O(1) set-based matching", "PDF parsing engine"],
+    verifiedMetrics: ["O(1) skill set matching"],
+    techCharacteristics: ["Rule-based PDF parsing", "RESTful scoring endpoint"],
     customBullets: [
       "High-performance Node.js REST API parsing PDF resumes and scoring against Job Descriptions.",
       "Optimized rule-based skill extraction and O(1) set-based matching algorithms."
@@ -1138,6 +1559,7 @@ Agent Controller (app/agent.py)
     title: "SniperThink — Prediction Engine",
     category: "Full Stack",
     verifiedMetrics: ["~1.2s response time", "↑ 25% engagement"],
+    techCharacteristics: ["Axios data layer", "Vite build pipeline"],
     customBullets: [
       "Full-stack prediction & decision interface with REST API integrations and Vite frontend.",
       "Optimized async data layer with Axios and lightweight UI interactions."
@@ -1148,7 +1570,8 @@ Agent Controller (app/agent.py)
     displayOrder: 11,
     title: "Virtual Assistant Platform",
     category: "AI / ML",
-    verifiedMetrics: ["~1.2s response latency", "JWT Authentication"],
+    verifiedMetrics: ["~1.2s response latency"],
+    techCharacteristics: ["JWT Secured Auth", "MongoDB Atlas", "Cloudinary media pipeline"],
     customBullets: [
       "Full-stack AI assistant with real-time streaming responses and JWT-secured authentication.",
       "MongoDB Atlas and Cloudinary media pipeline tuned for low latency."
@@ -1156,7 +1579,7 @@ Agent Controller (app/agent.py)
   }
 };
 
-// 2. VERIFIED STATIC SNAPSHOT (Guarantees zero downtime / instant load)
+// 3. VERIFIED STATIC SNAPSHOT DATASET
 const SNAPSHOT_PROJECTS = [
   {
     name: "bharatmentor",
@@ -1170,7 +1593,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: null,
     default_branch: "main",
     technologies: ["Python", "FastAPI", "RAG", "FAISS", "Gemini API", "Streamlit", "ElevenLabs"],
-    metrics: ["< 1.2s voice latency", "Safe AST evaluator"],
+    metrics: ["< 1.2s voice latency"],
+    techCharacteristics: ["Safe AST Math Evaluator", "FAISS Vector Store", "Streaming STT/TTS"],
     bullets: [
       "Voice-first AI learning mentor in English, Hindi & Hinglish with RAG knowledge retrieval.",
       "FastAPI backend with streaming STT/TTS pipeline and PostgreSQL/SQLite progress tracker.",
@@ -1192,6 +1616,7 @@ const SNAPSHOT_PROJECTS = [
     default_branch: "main",
     technologies: ["TypeScript", "React", "AI Agents", "LLM Diff Engine", "Tailwind CSS"],
     metrics: ["7-section structured PRDs", "Deterministic tickets"],
+    techCharacteristics: ["Append-only history", "Immutable snapshots", "Gantt milestones"],
     bullets: [
       "AI-powered PM copilot converting informal prototype wireframes into structured 7-section PRDs.",
       "Computes transparent diffs across prototype versions with deliberate human signoff gates.",
@@ -1212,7 +1637,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: "https://corporate-ownership-aml-investigato.vercel.app",
     default_branch: "main",
     technologies: ["TypeScript", "CognoDB", "OpenCypher", "Bolt Protocol", "Graph Visualization"],
-    metrics: ["Multi-hop graph traversal", "Bolt / CognoDB"],
+    metrics: [],
+    techCharacteristics: ["Multi-hop graph traversal", "Bolt / CognoDB", "Circular ownership resolution"],
     bullets: [
       "Interactive graph application investigating multi-hop corporate structures and circular ownership.",
       "Detects Ultimate Beneficial Owners (UBO) and shared nominee director risks in real-time.",
@@ -1233,7 +1659,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: null,
     default_branch: "main",
     technologies: ["TypeScript", "React", "Headless Rule Engine", "RBI Models", "Tailwind CSS"],
-    metrics: ["100% client-side privacy", "RBI APR model"],
+    metrics: ["100% client-side calculation"],
+    techCharacteristics: ["Headless engine", "RBI APR model", "Zero bureau tracking"],
     bullets: [
       "Retail borrower advocacy platform balancing lending asymmetry across Indian retail credit.",
       "Pure headless rules engine calculating FOIR thresholds, true risk interest rates, and APRs.",
@@ -1254,7 +1681,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: "https://grow-easy-backend.vercel.app",
     default_branch: "main",
     technologies: ["TypeScript", "Node.js", "Gemini 2.5 Flash", "Express", "Vercel"],
-    metrics: ["95%+ CSV import accuracy", "Gemini 2.5 Flash"],
+    metrics: ["95%+ CSV import accuracy"],
+    techCharacteristics: ["Gemini 2.5 Flash schema inference", "Node 20+ pipeline", "Real-time progress monitoring"],
     bullets: [
       "End-to-end data processing and automated CSV mapping platform with visual progress trackers.",
       "Modular Node 20+ / TypeScript backend with Gemini AI schema inference and structured error handling."
@@ -1278,7 +1706,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: null,
     default_branch: "main",
     technologies: ["Next.js", "Gemini LLM", "Imagen 3.0", "Firebase Firestore", "Tailwind CSS"],
-    metrics: ["↑ 50% personalization", "Imagen 3.0 visual plans"],
+    metrics: ["↑ 50% personalization accuracy"],
+    techCharacteristics: ["Gemini LLM", "Imagen 3.0 plans", "Firebase Firestore"],
     bullets: [
       "Full-stack fitness assistant built on Next.js with Gemini LLM personalized workout & diet plans.",
       "Integrated visual guidance generation using Imagen 3.0 and Firebase Firestore persistence."
@@ -1298,7 +1727,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: null,
     default_branch: "main",
     technologies: ["Python", "FastAPI", "Celery", "PostgreSQL", "Docker Compose", "Redis"],
-    metrics: ["FastAPI + Celery Workers", "Dockerized CI/CD"],
+    metrics: [],
+    techCharacteristics: ["FastAPI + Celery Workers", "PostgreSQL + Redis", "Dockerized CI/CD"],
     bullets: [
       "Enterprise financial automation engine for asynchronous document and transaction processing.",
       "Containerized Docker Compose environment with Celery task queues, Redis, and automated CI/CD."
@@ -1318,7 +1748,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: null,
     default_branch: "main",
     technologies: ["TypeScript", "Chrome Manifest V3", "Node.js", "Prisma", "PostgreSQL"],
-    metrics: ["Manifest V3 Worker", "Prisma ORM"],
+    metrics: [],
+    techCharacteristics: ["Manifest V3 Worker", "Prisma ORM", "PostgreSQL"],
     bullets: [
       "Manifest V3 Chrome Extension with modular background service workers and content script injection.",
       "Node.js + Express backend with Prisma ORM for structured multimodal visual assistance."
@@ -1338,7 +1769,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: null,
     default_branch: "main",
     technologies: ["JavaScript", "Node.js", "Express", "PDF Parser", "Algorithms"],
-    metrics: ["O(1) set matching", "Automated PDF parse"],
+    metrics: ["O(1) skill set matching"],
+    techCharacteristics: ["Rule-based PDF parsing", "REST scoring endpoint"],
     bullets: [
       "High-performance Node.js REST API parsing PDF resumes and scoring against Job Descriptions.",
       "Optimized rule-based skill extraction and O(1) set-based matching algorithms."
@@ -1358,7 +1790,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: null,
     default_branch: "main",
     technologies: ["JavaScript", "Node.js", "Express", "React (Vite)", "Framer Motion"],
-    metrics: ["~1.2s response", "↑ 25% engagement"],
+    metrics: ["~1.2s response time", "↑ 25% engagement"],
+    techCharacteristics: ["Axios async layer", "Vite build"],
     bullets: [
       "Full-stack prediction & decision interface with REST API integrations and Vite frontend.",
       "Optimized async data layer with Axios and lightweight UI interactions."
@@ -1378,7 +1811,8 @@ const SNAPSHOT_PROJECTS = [
     homepage: null,
     default_branch: "main",
     technologies: ["JavaScript", "React", "Node.js", "MongoDB", "Gemini API"],
-    metrics: ["~1.2s response latency", "JWT Secured"],
+    metrics: ["~1.2s response latency"],
+    techCharacteristics: ["JWT Secured Auth", "MongoDB Atlas", "Cloudinary media pipeline"],
     bullets: [
       "Full-stack AI assistant with real-time streaming responses and JWT-secured authentication.",
       "MongoDB Atlas and Cloudinary media pipeline tuned for low latency."
@@ -1388,122 +1822,220 @@ const SNAPSHOT_PROJECTS = [
   }
 ];
 
-// STATE STORE
+// 4. GITHUB DATA PROVIDER ABSTRACTION
+const GitHubDataProvider = {
+  parseReadme(repo, markdown) {
+    if (!markdown) return null;
+
+    const titleMatch = markdown.match(/^#\s+(?:[^\w\s]*\s*)?([^\n\r]+)/m);
+    const title = titleMatch ? titleMatch[1].trim() : repo.name;
+
+    const imgRegex = /!\[(.*?)\]\((.*?)\)/g;
+    let match;
+    const images = [];
+    const branch = repo.default_branch || 'main';
+    while ((match = imgRegex.exec(markdown)) !== null) {
+      const alt = match[1];
+      let src = match[2].trim();
+      if (src.includes('shields.io') || src.includes('badge.svg') || src.includes('img.shields')) continue;
+      if (src.startsWith('./')) src = src.slice(2);
+      if (!src.startsWith('http')) {
+        src = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${repo.name}/${branch}/${src}`;
+      }
+      images.push({ alt, src });
+    }
+
+    const getSection = (variants) => {
+      const pattern = variants.join('|');
+      const reg = new RegExp(`##?\\s+.*?(?:${pattern})[\\s\\S]*?[\\r\\n]+([\\s\\S]*?)(?=(?:##?\\s+|$))`, 'i');
+      const m = markdown.match(reg);
+      return (m && m[1].trim()) ? m[1].trim() : null;
+    };
+
+    const problem = getSection(['problem', 'challenge', 'motivation', 'why', 'why i built this', 'background']);
+    const solution = getSection(['solution', 'overview', 'what it does', 'about', 'approach', 'concept']);
+    const architecture = getSection(['architecture', 'system design', 'how it works', 'workflow', 'pipeline', 'structure']);
+    const features = getSection(['key features', 'features', 'capabilities', 'highlights', 'core features']);
+    const results = getSection(['results', 'performance', 'benchmarks', 'metrics', 'evaluation', 'impact']);
+
+    const bullets = [];
+    if (features) {
+      const bMatches = features.match(/^[*-]\s+\*\*?([^\*\n\r]+)\*\*?:?\s*(.*)$/gm);
+      if (bMatches) {
+        bMatches.slice(0, 3).forEach(b => bullets.push(b.replace(/^[*-]\s+/, '').trim()));
+      }
+    }
+
+    const verifiedMetrics = [];
+    if (results) {
+      const numMatches = results.match(/(?:[<~↑]?\s*\d+(?:\.\d+)?%?|\b\d+s\b|\bO\(1\)\b)[^,\n\r.]*/gi);
+      if (numMatches) {
+        numMatches.slice(0, 2).forEach(m => verifiedMetrics.push(m.trim()));
+      }
+    }
+
+    return { title, problem, solution, architecture, bullets, images, verifiedMetrics };
+  },
+
+  detectTechnologies(repo, parsed) {
+    const text = ((repo.description || '') + ' ' + (repo.readme || '')).toLowerCase();
+    const techMap = [
+      { name: 'Python', test: 'python' },
+      { name: 'FastAPI', test: 'fastapi' },
+      { name: 'TypeScript', test: 'typescript' },
+      { name: 'JavaScript', test: 'javascript' },
+      { name: 'React', test: 'react' },
+      { name: 'Next.js', test: 'next.js' },
+      { name: 'Celery', test: 'celery' },
+      { name: 'Docker', test: 'docker' },
+      { name: 'RAG', test: 'rag' },
+      { name: 'FAISS', test: 'faiss' },
+      { name: 'LangChain', test: 'langchain' },
+      { name: 'PostgreSQL', test: 'postgresql' },
+      { name: 'MongoDB', test: 'mongodb' },
+      { name: 'Redis', test: 'redis' },
+      { name: 'Prisma', test: 'prisma' },
+      { name: 'Gemini API', test: 'gemini' },
+      { name: 'OpenAI API', test: 'openai' },
+      { name: 'ElevenLabs', test: 'elevenlabs' },
+      { name: 'Streamlit', test: 'streamlit' },
+      { name: 'CognoDB', test: 'cogno' },
+      { name: 'Tailwind CSS', test: 'tailwind' }
+    ];
+
+    const detected = [];
+    if (repo.language) detected.push(repo.language);
+
+    techMap.forEach(t => {
+      if (text.includes(t.test) && !detected.includes(t.name)) {
+        detected.push(t.name);
+      }
+    });
+
+    return detected.slice(0, 5);
+  },
+
+  categorizeProject(name, techList, desc) {
+    const combined = (name + ' ' + techList.join(' ') + ' ' + (desc || '')).toLowerCase();
+    if (combined.includes('rag') || combined.includes('faiss') || combined.includes('gemini') || combined.includes('llm') || combined.includes('voice') || combined.includes('aml') || combined.includes('fitness')) {
+      return 'AI / ML';
+    }
+    if (combined.includes('copilot') || combined.includes('agent') || combined.includes('prd-pilot') || combined.includes('extension')) {
+      return 'AI Agents';
+    }
+    if (combined.includes('automation') || combined.includes('celery') || combined.includes('docker') || combined.includes('fastapi')) {
+      return 'Automation';
+    }
+    if (combined.includes('matcher') || combined.includes('tool') || combined.includes('dsa') || combined.includes('parser')) {
+      return 'Dev Tools';
+    }
+    return 'Full Stack';
+  },
+
+  computeRankScore(repo, override, parsed) {
+    let score = 0;
+    if (override.featured) score += 100;
+    if (parsed && parsed.problem) score += 25;
+    if (parsed && parsed.images && parsed.images.length) score += 25;
+    if (repo.homepage || override.demoUrl) score += 20;
+    if (repo.size > 50) score += 15;
+    if (repo.stargazers_count) score += repo.stargazers_count * 5;
+    if (repo.size < 5 && !repo.description) score -= 40;
+    return score;
+  },
+
+  async getRepositories() {
+    const res = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`);
+    if (!res.ok) throw new Error(`GitHub API HTTP ${res.status}`);
+    const repos = await res.json();
+    if (!Array.isArray(repos)) throw new Error('Invalid JSON response');
+
+    const normalized = [];
+
+    for (const r of repos) {
+      if (r.name === GITHUB_USERNAME) continue;
+
+      const override = PORTFOLIO_OVERRIDES[r.name] || {};
+      if (override.hidden) continue;
+
+      let tech = override.technologies || [];
+      let bullets = override.customBullets || [];
+      let verifiedMetrics = override.verifiedMetrics || [];
+      let techCharacteristics = override.techCharacteristics || [];
+      let images = [];
+      let parsed = null;
+
+      if (!override.customBullets || override.featured) {
+        try {
+          const rawRes = await fetch(`https://raw.githubusercontent.com/${GITHUB_USERNAME}/${r.name}/${r.default_branch || 'main'}/README.md`);
+          if (rawRes.ok) {
+            const rawMarkdown = await rawRes.text();
+            parsed = this.parseReadme(r, rawMarkdown);
+            if (parsed) {
+              if (parsed.images && parsed.images.length) images = parsed.images;
+              if (!bullets.length && parsed.bullets && parsed.bullets.length) bullets = parsed.bullets;
+              if (!tech.length) tech = this.detectTechnologies(r, parsed);
+              if (!verifiedMetrics.length && parsed.verifiedMetrics && parsed.verifiedMetrics.length) {
+                verifiedMetrics = parsed.verifiedMetrics;
+              }
+            }
+          }
+        } catch (err) {}
+      }
+
+      if (!tech.length) tech = this.detectTechnologies(r, null);
+      if (!bullets.length && r.description) bullets = [r.description];
+
+      const category = override.category || this.categorizeProject(r.name, tech, r.description);
+      const rankScore = this.computeRankScore(r, override, parsed);
+
+      normalized.push({
+        name: r.name,
+        title: override.title || (parsed && parsed.title ? parsed.title : r.name),
+        description: r.description || (override.customBullets ? override.customBullets[0] : 'Open-source software project on GitHub.'),
+        language: r.language || (tech.length ? tech[0] : 'Code'),
+        category: category,
+        stars: r.stargazers_count || 0,
+        updated_at: r.updated_at,
+        created_at: r.created_at,
+        html_url: r.html_url,
+        homepage: override.demoUrl || r.homepage,
+        default_branch: r.default_branch || 'main',
+        technologies: tech.length ? tech : ['TypeScript', 'Python'],
+        metrics: verifiedMetrics,
+        techCharacteristics: techCharacteristics,
+        bullets: bullets.length ? bullets : ['End-to-end engineered software pipeline with modular architecture.'],
+        images: images,
+        architecture: override.architecture || (parsed ? parsed.architecture : null),
+        problem: parsed ? parsed.problem : null,
+        solution: parsed ? parsed.solution : null,
+        featured: override.featured !== undefined ? override.featured : (rankScore > 40),
+        displayOrder: override.displayOrder !== undefined ? override.displayOrder : 99,
+        rankScore: rankScore
+      });
+    }
+
+    normalized.sort((a, b) => {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      if (a.displayOrder !== b.displayOrder) return a.displayOrder - b.displayOrder;
+      return b.rankScore - a.rankScore;
+    });
+
+    return normalized;
+  }
+};
+
+// APPLICATION STATE
 let allProjects = [...SNAPSHOT_PROJECTS];
 let currentCategory = 'all';
 let searchQuery = '';
 
-// 3. README & REPO PARSER ENGINE
-function parseReadmeMarkdown(repo, markdown) {
-  if (!markdown) return null;
-
-  // Title
-  const titleMatch = markdown.match(/^#\s+(?:[^\w\s]*\s*)?([^\n\r]+)/m);
-  const title = titleMatch ? titleMatch[1].trim() : repo.name;
-
-  // Images (filter out shields/badges)
-  const imgRegex = /!\[(.*?)\]\((.*?)\)/g;
-  let match;
-  const images = [];
-  while ((match = imgRegex.exec(markdown)) !== null) {
-    const alt = match[1];
-    let src = match[2].trim();
-    if (src.includes('shields.io') || src.includes('badge.svg') || src.includes('img.shields')) continue;
-    if (src.startsWith('./')) src = src.slice(2);
-    if (!src.startsWith('http')) {
-      src = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${repo.name}/${repo.default_branch || 'main'}/${src}`;
-    }
-    images.push({ alt, src });
-  }
-
-  // Section extractor
-  const getSection = (patterns) => {
-    for (const p of patterns) {
-      const reg = new RegExp('##?\\s+.*?' + p + '.*?[\\r\\n]+([\\s\\S]*?)(?=(?:##?\\s+|$))', 'i');
-      const m = markdown.match(reg);
-      if (m && m[1].trim()) return m[1].trim();
-    }
-    return null;
-  };
-
-  const problem = getSection(['problem', 'why', 'challenge', 'motivation']);
-  const solution = getSection(['solution', 'what it is', 'overview', 'about the project']);
-  const architecture = getSection(['architecture', 'how it works', 'system design', 'workflow']);
-  const features = getSection(['key features', 'features', 'capabilities', 'core features']);
-
-  // Bullets
-  const bullets = [];
-  if (features) {
-    const bMatches = features.match(/^[*-]\s+\*\*?([^\*\n\r]+)\*\*?:?\s*(.*)$/gm);
-    if (bMatches) {
-      bMatches.slice(0, 3).forEach(b => bullets.push(b.replace(/^[*-]\s+/, '').trim()));
-    }
-  }
-
-  return { title, problem, solution, architecture, bullets, images };
-}
-
-function detectTechnologies(repo, parsed) {
-  const text = ((repo.description || '') + ' ' + (repo.readme || '')).toLowerCase();
-  const techMap = [
-    { name: 'Python', test: 'python' },
-    { name: 'FastAPI', test: 'fastapi' },
-    { name: 'TypeScript', test: 'typescript' },
-    { name: 'JavaScript', test: 'javascript' },
-    { name: 'React', test: 'react' },
-    { name: 'Next.js', test: 'next.js' },
-    { name: 'Celery', test: 'celery' },
-    { name: 'Docker', test: 'docker' },
-    { name: 'RAG', test: 'rag' },
-    { name: 'FAISS', test: 'faiss' },
-    { name: 'LangChain', test: 'langchain' },
-    { name: 'PostgreSQL', test: 'postgresql' },
-    { name: 'MongoDB', test: 'mongodb' },
-    { name: 'Redis', test: 'redis' },
-    { name: 'Prisma', test: 'prisma' },
-    { name: 'Gemini API', test: 'gemini' },
-    { name: 'OpenAI API', test: 'openai' },
-    { name: 'ElevenLabs', test: 'elevenlabs' },
-    { name: 'Streamlit', test: 'streamlit' },
-    { name: 'CognoDB', test: 'cogno' },
-    { name: 'Tailwind CSS', test: 'tailwind' }
-  ];
-
-  const detected = [];
-  if (repo.language) detected.push(repo.language);
-
-  techMap.forEach(t => {
-    if (text.includes(t.test) && !detected.includes(t.name)) {
-      detected.push(t.name);
-    }
-  });
-
-  return detected.slice(0, 5);
-}
-
-function categorizeProject(name, techList, desc) {
-  const combined = (name + ' ' + techList.join(' ') + ' ' + (desc || '')).toLowerCase();
-  if (combined.includes('rag') || combined.includes('faiss') || combined.includes('gemini') || combined.includes('llm') || combined.includes('voice') || combined.includes('aml') || combined.includes('fitness')) {
-    return 'AI / ML';
-  }
-  if (combined.includes('copilot') || combined.includes('agent') || combined.includes('prd-pilot') || combined.includes('extension')) {
-    return 'AI Agents';
-  }
-  if (combined.includes('automation') || combined.includes('celery') || combined.includes('docker') || combined.includes('fastapi')) {
-    return 'Automation';
-  }
-  if (combined.includes('matcher') || combined.includes('tool') || combined.includes('dsa') || combined.includes('parser')) {
-    return 'Dev Tools';
-  }
-  return 'Full Stack';
-}
-
-// 4. FETCH GITHUB REPOSITORIES (STALE-WHILE-REVALIDATE)
+// SYNC GITHUB WITH CACHE RESILIENCE
 async function syncGitHubData() {
   const syncPill = document.getElementById('syncPill');
   const syncText = document.getElementById('syncStatusText');
 
-  // Check LocalStorage cache
   const cached = localStorage.getItem(CACHE_KEY);
   let cacheValid = false;
   if (cached) {
@@ -1518,106 +2050,27 @@ async function syncGitHubData() {
           syncText.textContent = `● GITHUB SYNCED · ${allProjects.length} REPOSITORIES`;
         }
       }
-    } catch (e) {
-      console.warn('Cache parse error:', e);
-    }
+    } catch (e) {}
   }
 
   if (cacheValid) return;
 
-  // Background fetch
   try {
-    const res = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`);
-    if (!res.ok) throw new Error(`GitHub API Status: ${res.status}`);
-    const repos = await res.json();
-
-    if (!Array.isArray(repos)) throw new Error('Invalid repos response');
-
-    const updatedProjects = [];
-
-    for (const r of repos) {
-      // Ignore profile config repo or internal forks if desired
-      if (r.name === GITHUB_USERNAME) continue;
-
-      const override = PORTFOLIO_OVERRIDES[r.name] || {};
-      if (override.hidden) continue;
-
-      let tech = override.technologies || [];
-      let bullets = override.customBullets || [];
-      let metrics = override.verifiedMetrics || [];
-      let images = [];
-      let parsed = null;
-
-      if (!override.customBullets || override.featured) {
-        try {
-          const rawRes = await fetch(`https://raw.githubusercontent.com/${GITHUB_USERNAME}/${r.name}/${r.default_branch || 'main'}/README.md`);
-          if (rawRes.ok) {
-            const rawMarkdown = await rawRes.text();
-            parsed = parseReadmeMarkdown(r, rawMarkdown);
-            if (parsed) {
-              if (parsed.images && parsed.images.length) images = parsed.images;
-              if (!bullets.length && parsed.bullets && parsed.bullets.length) bullets = parsed.bullets;
-              if (!tech.length) tech = detectTechnologies(r, parsed);
-            }
-          }
-        } catch (err) {}
-      }
-
-      if (!tech.length) tech = detectTechnologies(r, null);
-      if (!bullets.length && r.description) bullets = [r.description];
-
-      const category = override.category || categorizeProject(r.name, tech, r.description);
-
-      updatedProjects.push({
-        name: r.name,
-        title: override.title || (parsed && parsed.title ? parsed.title : r.name),
-        description: r.description || (override.customBullets ? override.customBullets[0] : 'Open-source software project on GitHub.'),
-        language: r.language || (tech.length ? tech[0] : 'Code'),
-        category: category,
-        stars: r.stargazers_count || 0,
-        updated_at: r.updated_at,
-        created_at: r.created_at,
-        html_url: r.html_url,
-        homepage: override.demoUrl || r.homepage,
-        default_branch: r.default_branch || 'main',
-        technologies: tech.length ? tech : ['TypeScript', 'Python'],
-        metrics: metrics.length ? metrics : (override.verifiedMetrics || ['Verified GitHub Build']),
-        bullets: bullets.length ? bullets : ['End-to-end engineered software pipeline with modular architecture.'],
-        images: images,
-        architecture: override.architecture || (parsed ? parsed.architecture : null),
-        problem: parsed ? parsed.problem : null,
-        solution: parsed ? parsed.solution : null,
-        featured: override.featured !== undefined ? override.featured : (r.size > 20 && Boolean(r.description)),
-        displayOrder: override.displayOrder !== undefined ? override.displayOrder : 99
-      });
-    }
-
-    // Sort: Featured first by displayOrder, then by updated_at
-    updatedProjects.sort((a, b) => {
-      if (a.featured && !b.featured) return -1;
-      if (!a.featured && b.featured) return 1;
-      if (a.displayOrder !== b.displayOrder) return a.displayOrder - b.displayOrder;
-      return new Date(b.updated_at) - new Date(a.updated_at);
-    });
-
-    if (updatedProjects.length > 0) {
-      allProjects = updatedProjects;
+    const freshProjects = await GitHubDataProvider.getRepositories();
+    if (freshProjects && freshProjects.length > 0) {
+      allProjects = freshProjects;
       localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: allProjects }));
     }
-
     syncPill.classList.remove('cached');
     syncText.textContent = `● GITHUB SYNCED · ${allProjects.length} REPOSITORIES`;
     renderAll();
-
   } catch (err) {
-    console.warn('GitHub API sync offline or rate limited. Using snapshot/cache dataset:', err);
     syncPill.classList.add('cached');
     syncText.textContent = `○ GITHUB CACHE · ${allProjects.length} REPOSITORIES`;
     renderAll();
   }
 }
 
-// 5. TIME FORMATTING HELPER
 function formatRelativeTime(dateString) {
   if (!dateString) return 'recently';
   const diff = Date.now() - new Date(dateString).getTime();
@@ -1630,7 +2083,6 @@ function formatRelativeTime(dateString) {
   return `${Math.floor(months / 12)}y ago`;
 }
 
-// 6. RENDER PROJECT CARDS
 function renderProjects() {
   const grid = document.getElementById('projectGrid');
   const countMeta = document.getElementById('projectCountMeta');
@@ -1666,7 +2118,9 @@ function renderProjects() {
 
     const techChips = (p.technologies || []).slice(0, 4).map(t => `<span class="tech-tag">${t}</span>`).join('');
     const bulletsHtml = (p.bullets || []).slice(0, 2).map(b => `<li>${b}</li>`).join('');
+
     const metricsHtml = (p.metrics || []).map(m => `<div class="proj-metric">${m}</div>`).join('');
+    const techCharHtml = (p.techCharacteristics || []).slice(0, 2).map(c => `<span class="tech-char-tag">${c}</span>`).join('');
 
     const demoBtn = p.homepage
       ? `<a href="${p.homepage}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">Live Demo ↗</a>`
@@ -1692,7 +2146,12 @@ function renderProjects() {
           <p class="proj-desc">${p.description}</p>
           <ul class="proj-bullets">${bulletsHtml}</ul>
 
-          ${metricsHtml ? `<div class="proj-metric-row">${metricsHtml}</div>` : ''}
+          ${(metricsHtml || techCharHtml) ? `
+            <div class="proj-metric-row">
+              ${metricsHtml}
+              ${techCharHtml}
+            </div>
+          ` : ''}
 
           <div class="proj-footer">
             <div class="proj-activity">Updated ${formatRelativeTime(p.updated_at)}</div>
@@ -1710,7 +2169,6 @@ function renderProjects() {
   init3DTilt();
 }
 
-// 7. RENDER LANGUAGE DISTRIBUTION BAR
 function renderLanguageStats() {
   const bar = document.getElementById('langDistBar');
   const legend = document.getElementById('langLegend');
@@ -1759,7 +2217,6 @@ function renderLanguageStats() {
   if (statRepo) statRepo.textContent = allProjects.length;
 }
 
-// 8. RENDER LIVE BUILD LOG TIMELINE
 function renderBuildLog() {
   const container = document.getElementById('buildLogTimeline');
   if (!container) return;
@@ -1770,7 +2227,7 @@ function renderBuildLog() {
     <div class="buildlog-item">
       <div class="buildlog-date">${new Date(p.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
       <div class="buildlog-name">
-        <a href="${p.html_url}" target="_blank" rel="noopener" style="color:var(--text); hover:color:var(--accent);">${p.name}</a>
+        <a href="${p.html_url}" target="_blank" rel="noopener" style="color:var(--text);">${p.name}</a>
         <span class="badge badge-accent" style="margin-left:6px; font-size:10px;">${p.category}</span>
       </div>
       <div class="buildlog-desc">${p.description ? p.description.slice(0, 110) + '...' : 'Repository updated on GitHub.'}</div>
@@ -1778,17 +2235,15 @@ function renderBuildLog() {
   `).join('');
 }
 
-// 9. METRIC TICKER BUILDER & INTERACTION
 function buildMetricTicker() {
   const defaultMetrics = [
-    { v: "< 1.2s", l: "voice-first learning mentor latency (BharatMentor)" },
+    { v: "< 1.2s", l: "voice-first mentor latency (BharatMentor)" },
     { v: "7-Section", l: "structured PRD generator (Beep PM Copilot)" },
-    { v: "Multi-Hop", l: "graph UBO traversal on CognoDB / Bolt" },
-    { v: "100%", l: "client-side borrower advocacy privacy" },
+    { v: "100%", l: "client-side privacy (Borrower Copilot)" },
     { v: "95%+", l: "automated CSV import accuracy (GrowEasy)" },
     { v: "50%", l: "personalization accuracy lift (AI Fitness Coach)" },
     { v: "O(1)", l: "set-based resume matching (Resume-JD Matcher)" },
-    { v: "FastAPI + Celery", l: "containerized task workers (Finfully Lab)" }
+    { v: "~1.2s", l: "real-time response (SniperThink)" }
   ];
 
   const track = document.getElementById('tickerTrack');
@@ -1818,12 +2273,10 @@ function buildMetricTicker() {
   }
 }
 
-// 10. CASE STUDY MODAL & ROUTING
 function openCaseStudy(repoName) {
   const p = allProjects.find(item => item.name.toLowerCase() === repoName.toLowerCase());
   if (!p) return;
 
-  // Update URL hash
   window.location.hash = `/project/${p.name}`;
 
   document.getElementById('modalCategory').textContent = p.category;
@@ -1854,10 +2307,11 @@ function openCaseStudy(repoName) {
 
   const bulletsHtml = (p.bullets || []).map(b => `<li>${b}</li>`).join('');
   const metricsHtml = (p.metrics || []).map(m => `<div class="proj-metric">${m}</div>`).join('');
+  const techCharHtml = (p.techCharacteristics || []).map(c => `<span class="tech-char-tag">${c}</span>`).join('');
 
   document.getElementById('modalBody').innerHTML = `
     <div>
-      <div class="modal-sec-title">The Engineering Solution</div>
+      <div class="modal-sec-title">The Engineering Overview</div>
       <div class="case-solution">
         <p>${p.description}</p>
       </div>
@@ -1866,14 +2320,17 @@ function openCaseStudy(repoName) {
     ${archHtml}
 
     <div>
-      <div class="modal-sec-title">Key Capabilities & Architecture Highlights</div>
+      <div class="modal-sec-title">Key Capabilities & Features</div>
       <ul class="proj-bullets" style="font-size:14.5px;">${bulletsHtml}</ul>
     </div>
 
-    ${metricsHtml ? `
+    ${(metricsHtml || techCharHtml) ? `
       <div>
-        <div class="modal-sec-title">Verified Benchmarks & Targets</div>
-        <div class="proj-metric-row">${metricsHtml}</div>
+        <div class="modal-sec-title">Verified Benchmarks & Technical Traits</div>
+        <div class="proj-metric-row">
+          ${metricsHtml}
+          ${techCharHtml}
+        </div>
       </div>
     ` : ''}
 
@@ -1911,7 +2368,6 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// 11. COMMAND PALETTE (CTRL+K / CMD+K)
 function openCmdPalette() {
   const cmd = document.getElementById('cmdModal');
   cmd.classList.add('open');
@@ -1991,7 +2447,6 @@ function renderCmdResults(q) {
   });
 }
 
-// 12. 3D TILT EFFECT FOR PROJECT CARDS (POINTER GUARDED)
 function init3DTilt() {
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.querySelectorAll('.proj-card').forEach(card => {
@@ -2016,7 +2471,6 @@ function init3DTilt() {
   }
 }
 
-// 13. CONTROLS, FILTERS & EVENTS
 function setCategory(cat) {
   currentCategory = cat;
   document.querySelectorAll('#categoryFilters .filter-btn').forEach(btn => {
@@ -2041,8 +2495,11 @@ function renderAll() {
   renderBuildLog();
 }
 
-// 14. INITIALIZATION & SCROLL ENGINE
+// INITIALIZATION & SCROLL ENGINE
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize Interactive Galaxy Background
+  window.galaxy = new InteractiveGalaxy('galaxyCanvas');
+
   buildMetricTicker();
   renderAll();
   syncGitHubData();
@@ -2105,11 +2562,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Check URL hash for direct deep case study routing
-  if (window.location.hash.startsWith('#/project/')) {
-    const slug = window.location.hash.replace('#/project/', '');
-    openCaseStudy(slug);
+  // Handle URL hash routing (e.g. #/project/bharatmentor)
+  function handleHashRoute() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#/project/')) {
+      const slug = hash.replace('#/project/', '');
+      openCaseStudy(slug);
+    }
   }
+
+  window.addEventListener('popstate', handleHashRoute);
+  handleHashRoute();
 
   // IntersectionObserver for Section Reveals and Dividers
   const revealObserver = new IntersectionObserver((entries) => {
